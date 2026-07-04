@@ -14,7 +14,8 @@ var FIELDS = [
   'flower_experience', 'budget', 'available_time', 'service_experience',
   'business_type', 'location_size', 'store_style', 'brand_concept', 'products',
   'strengths', 'weaknesses', 'consulting_items', 'available_schedule',
-  'start_date', 'fee_guide', 'concerns', 'other_requests', 'consultant_summary'
+  'start_date', 'fee_guide', 'concerns', 'other_requests', 'consultant_summary',
+  'privacy', 'marketing'
 ];
 
 // 사람이 읽기 쉬운 한글 헤더 (첫 열은 접수시각)
@@ -24,7 +25,8 @@ var HEADERS = [
   '꽃 관련 경험', '예상 창업비용', '하루 운영가능 시간', '서비스업 경험',
   '희망 창업형태', '희망 지역/평수', '매장 스타일', '브랜드 컨셉', '판매 희망상품',
   '본인 강점', '보완 필요부분', '필요 컨설팅 항목', '참여 가능 요일/시간',
-  '희망 시작일', '비용안내 여부', '가장 큰 고민', '기타 요청사항', '상담 요약(컨설턴트)'
+  '희망 시작일', '비용안내 여부', '가장 큰 고민', '기타 요청사항', '상담 요약(컨설턴트)',
+  '개인정보 동의', '마케팅 수신동의'
 ];
 
 function _sheet() {
@@ -34,6 +36,16 @@ function _sheet() {
 function _ensureHeader(sheet) {
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(HEADERS);
+    sheet.setFrozenRows(1);
+    return;
+  }
+  // 헤더가 없거나 열이 늘어났으면 첫 행을 최신 HEADERS로 교체 (자기 치유)
+  var width = Math.max(sheet.getLastColumn(), HEADERS.length);
+  var cur = sheet.getRange(1, 1, 1, width).getValues()[0];
+  var matches = sheet.getLastColumn() >= HEADERS.length &&
+    HEADERS.every(function (h, i) { return cur[i] === h; });
+  if (!matches) {
+    sheet.getRange(1, 1, 1, HEADERS.length).setValues([HEADERS]);
     sheet.setFrozenRows(1);
   }
 }
